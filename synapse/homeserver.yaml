@@ -1,0 +1,40 @@
+# Configuration file for Synapse.
+#
+# This is a YAML file: see [1] for a quick introduction. Note in particular
+# that *indentation is important*: all the elements of a list or dictionary
+# should have the same indentation.
+#
+# [1] https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html
+#
+# For more information on how to configure Synapse, including a complete accounting of
+# each option, go to docs/usage/configuration/config_documentation.md or
+# https://element-hq.github.io/synapse/latest/usage/configuration/config_documentation.html
+server_name: "my.matrix.host" # should be the same as homeserver->domain in mautrix-telegram/config.yaml file
+pid_file: DATADIR/homeserver.pid
+listeners:
+  - port: 8008
+    tls: false
+    type: http
+    x_forwarded: true
+    bind_addresses: ['::1', '127.0.0.1']
+    resources:
+      - names: [client, federation]
+        compress: false
+database:
+  name: psycopg2
+  allow_unsafe_locale: true
+  args:
+    user: synapse_user_srv
+    password: synapse_password_srv
+    host: postgres
+    port: 5432
+    database: synapse_srv
+log_config: "CONFDIR/SERVERNAME.log.config"
+media_store_path: DATADIR/media_store
+signing_key_path: "CONFDIR/SERVERNAME.signing.key"
+trusted_key_servers:
+  - server_name: "matrix.org"
+
+# https://docs.mau.fi/bridges/general/registering-appservices.html#synapse
+app_service_config_files:
+  - /data/telegram-registration.yaml

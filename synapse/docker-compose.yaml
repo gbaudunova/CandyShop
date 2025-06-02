@@ -1,0 +1,37 @@
+# Example of docker-compose file for Synapse Server
+version: '3.7'
+
+services:
+  synapse:
+    image: matrixdotorg/synapse:latest
+    container_name: synapse
+    restart: always
+    ports:
+      - "8008:8008"  # Expose HTTP API (in production use reverse proxy)
+    volumes:
+      - ./data/synapse:/data  # Contains homeserver.yaml and keys
+    environment:
+      - SYNAPSE_CONFIG_PATH=/data/homeserver.yaml
+    depends_on:
+      - postgres
+    networks:
+      - default
+      - synapsenet
+
+  postgres:
+    image: postgres:13
+    container_name: synapse_postgres
+    restart: always
+    environment:
+      POSTGRES_DB: synapse_srv
+      POSTGRES_USER: synapse_user_srv
+      POSTGRES_PASSWORD: synapse_password_srv
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+
+networks:
+  default:
+  synapsenet:
+    external:
+      name: synapsenet
+

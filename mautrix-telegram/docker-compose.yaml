@@ -1,0 +1,40 @@
+# Example of docker-compose file for mautrix-telegram
+version: '3.8'
+
+services:
+  mautrix-telegram:
+    image: dock.mau.dev/mautrix/telegram:latest
+    container_name: mautrix-telegram
+    restart: unless-stopped
+    volumes:
+      - ./config:/data
+      - ./logs:/logs
+    ports:
+      - "29317:29317"
+    environment:
+      - UID=1000
+      - GID=1000
+      - LOG_LEVEL=debug
+    depends_on:
+      - postgres
+    networks:
+      - default
+      - synapsenet
+
+
+  postgres:
+    image: postgres:14.2-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: mautrix-telegram_srv
+      POSTGRES_USER: user_srv
+      POSTGRES_PASSWORD: password_srv
+    # If synapse is in a different network, then add this container to that network.
+    networks:
+      - default
+
+networks:
+  default:
+  synapsenet:
+    external:
+      name: synapsenet
